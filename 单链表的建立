@@ -1,0 +1,68 @@
+//SList.h
+
+#pragma once
+#include<stdio.h>
+#include<stdlib.h>
+typedef int SLTateType;
+typedef struct SListNode
+{
+	SLTateType data;
+	struct SListNode* next;
+}SLTNode;
+
+void SListPrint(SLTNode* phead);
+void SListPushBack(SLTNode** pphead, SLTateType x);
+
+//SList.c
+
+#include "SList.h"
+
+void SListPrint(SLTNode* phead)
+{
+	SLTNode* cur = phead;
+	while (cur != NULL)
+	{
+		printf("%d->", cur->data);
+		cur = cur->next; 
+	}
+}
+void SListPushBack(SLTNode** pphead, SLTateType x)
+{
+	SLTNode* newnode = (SLTNode*)malloc(sizeof(SLTNode));
+	newnode->data = x;
+	newnode->next = NULL;
+	if (*pphead == NULL)
+	{
+		*pphead = newnode;
+	}
+	else
+	{
+		SLTNode* tail = *pphead;
+		while(tail->next != NULL)
+		{
+			tail = tail->next;
+		}
+
+		tail->next = newnode;
+	}
+}
+
+//test.c
+
+#include "SList.h"
+
+void TestList1()
+{
+	SLTNode* plist = NULL;
+	SListPushBack(&plist, 1);
+	SListPushBack(&plist, 2);
+	SListPushBack(&plist, 3);
+	SListPushBack(&plist, 4);
+
+	SListPrint(plist);
+}
+int main()
+{
+	TestList1();
+	return 0;
+}
