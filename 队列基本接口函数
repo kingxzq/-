@@ -1,0 +1,148 @@
+//Queue.h
+#pragma once
+#include<stdio.h>
+#include<stdlib.h>
+#include<assert.h>
+#include<stdbool.h>
+
+typedef int QDateType;
+
+typedef struct QueueNode
+{
+	struct QueueNode* next;
+	QDateType data;
+}QueueNode;
+
+typedef struct Queue
+{
+	QueueNode* head;
+	QueueNode* tail;
+}Queue;
+
+void QueueInit(Queue* pq);
+void QueueDestroy(Queue* pq);
+void QueuePush(Queue* pq, QDateType x);
+void QueuePop(Queue* pq);
+QDateType QueueFront(Queue* pq);
+QDateType QueueBack(Queue* pq);
+int QueueSize(Queue* pq);
+bool QueueEmpty(Queue* pq);
+
+
+//Queue.c
+
+#include"Queue.h"
+
+void QueueInit(Queue* pq)
+{
+	assert(pq);
+	pq->head = NULL;
+	pq->tail = NULL;
+}
+void QueueDestroy(Queue* pq)
+{
+	assert(pq);
+	QueueNode* cur = pq->head;
+	while (cur != NULL)
+	{
+		QueueNode* next = cur->next;
+		free(cur);
+		cur=next;
+	}
+	pq->head = pq->tail = NULL;
+}
+void QueuePush(Queue* pq, QDateType x)
+{
+	assert(pq);
+	QueueNode* newnode = (QueueNode*)malloc(sizeof(QueueNode));
+	newnode->data = x;
+	newnode->next = NULL;
+
+	if (pq->head == NULL)
+	{
+		pq->head = pq->tail = newnode;
+	}
+	else
+	{
+		pq->tail->next = newnode;
+		pq->tail = newnode;
+	}
+}
+void QueuePop(Queue* pq)
+{
+	assert(pq);
+	assert(!QueueEmpty(pq));
+	QueueNode* next = pq->head->next;
+	free(pq->head);
+	pq->head = next;
+	if (pq->head == NULL)
+	{
+		pq->tail = NULL;
+	}
+}
+QDateType QueueFront(Queue* pq)
+{
+	assert(pq);
+	assert(!QueueEmpty(pq));
+
+	return pq->head->data;
+}
+QDateType QueueBack(Queue* pq)
+{
+	assert(pq);
+	assert(!QueueEmpty(pq));
+
+	return pq->tail->data;
+}
+int QueueSize(Queue* pq)
+{
+	assert(pq);
+
+	int n = 0;
+	QueueNode* cur = pq->head;
+	while (cur)
+	{
+		++n;
+		cur = cur->next;
+	}
+	return n;
+}
+bool QueueEmpty(Queue* pq)
+{
+	assert(pq);
+	return pq->head == NULL;
+}
+
+//Test.c
+
+#include"Queue.h"
+
+
+void TestQueue1()
+{
+	Queue q;
+	QueueInit(&q);
+	QueuePush(&q, 1);
+	QueuePush(&q, 2);
+	QueuePush(&q, 3);
+	QueuePush(&q, 4);
+
+	printf("%d\n", QueueBack(&q));
+	printf("%d\n", QueueSize(&q));
+
+	while (!QueueEmpty(&q))
+	{
+		QDateType front = QueueFront(&q);
+		printf("%d ", front);
+		QueuePop(&q);
+	}
+	printf("\n");
+
+	QueueDestroy(&q);
+
+}
+int main()
+{
+	TestQueue1();
+	return 0;
+}
