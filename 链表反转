@@ -1,0 +1,39 @@
+#include <stdio.h>
+
+typedef int elemtype;
+
+typedef struct node
+
+{
+
+    elemtype data;
+
+    struct node *next;
+
+}linklist;
+
+void function(linklist *head)
+
+{
+
+    linklist *s,*p;
+
+    p=head->next;
+
+    head->next=NULL;
+
+    while(p!=NULL)
+
+    {
+
+        s=p;
+
+        p=p->next;
+
+        s->next=head->next;
+
+        head->next=s;
+
+    }
+
+}//function
