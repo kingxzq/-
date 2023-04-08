@@ -1,0 +1,62 @@
+#define _CRT_SECURE_NO_WARNINGS 1
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+// 交换两个数的值
+void swap(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// 随机选择一个枢轴元素，并将序列分为左右两部分
+int partition(int R[], int left, int right) {
+    // 选取一个随机的下标作为枢轴
+    int pivot_index = left + rand() % (right - left + 1);
+    int pivot = R[pivot_index];
+    // 将枢轴元素移到序列的最右侧
+    swap(&R[pivot_index], &R[right]);
+
+    int i = left - 1; // i指向小于等于枢轴元素的最后一个元素
+    for (int j = left; j < right; j++) {
+        if (R[j] <= pivot) {
+            i++;
+            swap(&R[i], &R[j]);
+        }
+    }
+    // 将枢轴元素插入到合适的位置
+    swap(&R[i + 1], &R[right]);
+    return i + 1;
+}
+
+// 找出序列中第k小的元素
+int quickselect(int R[], int left, int right, int k) {
+    if (left == right) { // 如果序列只有一个元素
+        return R[left];
+    }
+    int pivot_index = partition(R, left, right);
+    int pivot_rank = pivot_index - left + 1;
+    if (k == pivot_rank) {
+        return R[pivot_index];
+    }
+    else if (k < pivot_rank) {
+        return quickselect(R, left, pivot_index - 1, k);
+    }
+    else {
+        return quickselect(R, pivot_index + 1, right, k - pivot_rank);
+    }
+}
+
+int main() {
+    // 生成随机序列
+    srand(time(NULL));
+    int n = 10;
+    int R[] = { 15, 18, 29, 12, 35, 32, 27, 23, 10, 20 };
+    int k = 3; // 要找出第3小的元素
+
+    int result = quickselect(R, 0, n - 1, k);
+    printf("第%d小的元素是%d\n", k, result);
+
+    return 0;
+}
