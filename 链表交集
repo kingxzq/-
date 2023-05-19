@@ -1,0 +1,155 @@
+#define _CRT_SECURE_NO_WARNINGS 1
+#include<stdio.h>
+#include<stdlib.h>
+#include<assert.h>
+typedef int SLTDataType;
+typedef struct SListNode
+{
+	SLTDataType data;
+	struct SListNode* next;
+}SLTNode;
+//打印链表
+void SListPrint(SLTNode* plist)
+{
+	SLTNode* cur = plist;
+	while (cur != NULL)
+	{
+		printf("%d->", cur->data);
+		cur = cur->next;
+	}
+	printf("NULL\n");
+}
+//链表结点建立
+SLTNode* BuySLTNode(SLTDataType x)
+{
+	SLTNode* node = (SLTNode*)malloc(sizeof(SLTNode));
+	node->data = x;
+	node->next = NULL;
+
+	return node;
+}
+//尾插
+void SListPushBack(SLTNode** pplist, SLTDataType x)
+{
+	SLTNode* newnode = BuySLTNode(x);
+
+	// 1.空
+	// 2.非空
+	if (*pplist == NULL)
+	{
+		*pplist = newnode;
+	}
+	else
+	{
+		// 找尾
+		SLTNode* tail = *pplist;
+		while (tail->next != NULL)
+		{
+			tail = tail->next;
+		}
+		tail->next = newnode;
+	}
+}
+//尾删
+void SListPopBack(SLTNode** pplist)
+{
+	if (*pplist == NULL)
+	{
+		return;
+	}
+	else if ((*pplist)->next == NULL)
+	{
+		free(*pplist);
+		*pplist = NULL;
+	}
+	else
+	{
+		SLTNode* prev = NULL;
+		SLTNode* tail = *pplist;
+		while (tail->next != NULL)
+		{
+			prev = tail;
+			tail = tail->next;
+		}
+		free(tail);
+		tail = NULL;
+
+		prev->next = NULL;
+	}
+}
+//销毁链表
+void SListEraseAfter(SLTNode* pos)
+{
+	assert(pos);
+	if (pos->next == NULL)
+	{
+		return;
+	}
+	else
+	{
+		SLTNode* next = pos->next;
+		pos->next = next->next;
+		free(next);
+	}
+}
+//求链表交集
+SLTNode* Intersection(SLTNode* list1, SLTNode* list2) {
+	if (list1 == NULL)
+		return list1;
+	if (list2 == NULL)
+		return list2;
+
+	SLTNode* Head = NULL;
+	SLTNode* Tail = NULL;
+
+	while (list1 != NULL && list2 != NULL)
+	{
+		if (list1->data == list2->data)
+		{
+			SLTNode* newnode = NULL;
+			SListPushBack(&newnode, list1->data);
+
+			if (Head == NULL)
+			{
+				Head = newnode;
+				Tail = newnode;
+			}
+			else
+			{
+				Tail->next = newnode;
+				Tail = Tail->next;
+			}
+			list1 = list1->next;
+			list2 = list2->next;
+		}
+		else if (list1->data < list2->data)
+			list1 = list1->next;
+		else
+			list2 = list2->next;
+	}
+
+	return Head;
+}
+
+int main()
+{
+	SLTNode* List1 = NULL;
+	SLTNode* List2 = NULL;
+
+	SListPushBack(&List1, 1);
+	SListPushBack(&List1, 2);
+	SListPushBack(&List1, 3);
+	SListPushBack(&List1, 4);
+	SListPushBack(&List1, 5);
+	SListPrint(List1);
+
+	SListPushBack(&List2, 2);
+	SListPushBack(&List2, 5);
+	SListPushBack(&List2, 7);
+	SListPushBack(&List2, 8);
+	SListPushBack(&List2, 9);
+	SListPrint(List2);
+
+	SLTNode* List3 = Intersection(List1,List2);
+	SListPrint(List3);
+}
