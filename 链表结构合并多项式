@@ -1,0 +1,80 @@
+#define _CRT_SECURE_NO_WARNINGS 1
+#define _CRT_SECURE_NO_WARNINGS 1
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct node
+{
+    float coef;  // 系数
+    int exp;     // 指数
+    struct node* next; // 指向下一个节点的指针
+} Node, * Polynomial;
+
+void insertTerm(Polynomial* p, float coef, int exp)//插入多项式
+{
+    Node* newTerm = (Node*)malloc(sizeof(Node));//动态内存分配
+    newTerm->coef = coef;
+    newTerm->exp = exp;
+    newTerm->next = NULL;//初始化
+    if (*p == NULL || exp > (*p)->exp)//为空插入
+    {
+        newTerm->next = *p;
+        *p = newTerm;
+    }
+    else//后插入
+    {
+        Node* cur = *p;
+        while (cur->next != NULL && exp < cur->next->exp)//判断排序
+        {
+            cur = cur->next;
+        }
+        newTerm->next = cur->next;
+        cur->next = newTerm;
+    }
+}
+
+void printPolynomial(Polynomial p)//打印多项式
+{
+    if (p == NULL)
+    {
+        printf("0\n");
+        return;
+    }
+    while (p != NULL)
+    {
+        if (p->coef != 0)
+        {
+            printf("%fx^%d", p->coef, p->exp);
+            if (p->next != NULL && p->next->coef > 0)
+            {
+                printf("+");
+            }
+        }
+        p = p->next;
+    }
+    printf("\n");
+}
+
+void readPolynomial(Polynomial* p)//用户输入接口函数
+{
+    float coef;
+    int exp;
+    int num_terms;//项数
+
+    printf("输入多项式中的项数: ");
+    scanf("%d", &num_terms);
+
+    for (int i = 0; i < num_terms; i++)
+    {
+        printf("输入项的系数和指数 %d: ", i + 1);
+        scanf("%f %d", &coef, &exp);
+        insertTerm(p, coef, exp);
+    }
+}
+
+int main()
+{
+    Polynomial p = NULL;
+    readPolynomial(&p);
+    printPolynomial(p);
+    return 0;
+}
