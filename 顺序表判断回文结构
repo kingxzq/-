@@ -1,0 +1,141 @@
+  #define _CRT_SECURE_NO_WARNINGS 1
+#include<stdio.h>
+#include<stdlib.h>
+#include<assert.h>
+#include<stdbool.h>
+#include<string.h>
+
+typedef char STDataType;
+typedef struct Stack
+{
+	STDataType* a;
+	int top;
+	int capacity;
+}ST;
+
+//栈初始化
+void StackInit(ST* ps)
+{
+	assert(ps);
+	ps->a = NULL;
+	ps->top = 0;
+	ps->capacity = 0;
+}
+//栈销毁
+void StackDestroy(ST* ps)
+{
+	assert(ps);
+	free(ps->a);
+	ps->a = NULL;
+	ps->capacity = ps->top = 0;
+}
+//入栈
+void StackPush(ST* ps, STDataType x)
+{
+	assert(ps);
+	if (ps->top == ps->capacity)
+	{
+		int newCapacity = ps->capacity == 0 ? 4 : ps->capacity * 2;
+		STDataType* tmp = realloc(ps->a, sizeof(STDataType) * newCapacity);
+		if (tmp == NULL)
+		{
+			printf("realloc fail\n");
+			exit(-1);
+		}
+		ps->a = tmp;
+		ps->capacity = newCapacity;
+	}
+	ps->a[ps->top] = x;
+	ps->top++;
+}
+//出栈
+void StackPop(ST* ps)
+{
+	assert(ps);
+	if(ps->top>0)
+	{
+		ps->top--;
+	}
+}
+//返回栈顶元素
+STDataType StackTop(ST* ps)
+{
+	assert(ps);
+	if(ps->top>0)
+	{
+		return ps->a[ps->top - 1];
+	}
+}
+//栈是否为空
+bool STackEmpty(ST* ps)
+{
+	assert(ps);
+	return ps->top == 0;
+}
+//回文判定
+bool IsPalindrome(char* s)
+{
+	ST st;
+	StackInit(&st);
+
+	int i = 0;
+	int j = strlen(s) / 2;
+	if (strlen(s) % 2 == 0)
+	{
+		for (i = 0; i < j; i++)
+		{
+			StackPush(&st, s[i]);
+			if (i ==  j - 1)
+			{
+				for (; j< strlen(s); j++)
+				{
+					if (StackTop(&st) == s[j])
+					{
+						StackPop(&st);
+					}
+					else
+						return false;
+				}
+				if (STackEmpty)
+					return true;
+			}
+		}
+	}
+	else
+	{
+		for (i = 0; i < j; i++)
+		{
+			StackPush(&st, s[i]);
+			if (i == j - 1)
+			{
+				j++;
+				for (; j < strlen(s); j++)
+				{
+					if (StackTop(&st) == s[j])
+					{
+						StackPop(&st);
+					}
+					else
+						return false;
+				}
+				if (STackEmpty)
+					return true;
+			}
+		}
+	}
+}
+int main()
+{
+	char s[100];
+
+	while(gets(s))
+	{
+		if (IsPalindrome(s))
+			printf("该字符串是回文结构\n");
+		else
+			printf("该字符串不是回文结构\n");
+	}
+
+	return 0;
+}
+
