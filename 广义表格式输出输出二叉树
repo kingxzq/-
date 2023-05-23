@@ -1,0 +1,121 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAXSIZE 200
+typedef char DataType;
+typedef struct Node {
+    int data;
+    struct Node* left;
+    struct Node* right;
+} Node;
+
+void CreateBiTree(Node** T, DataType* str) {
+    Node* S[MAXSIZE];
+    Node* p = NULL;
+    int top = 0, k = 0, j = 0;
+    char ch;
+    *T = NULL;
+    ch = str[j];
+    while (ch != '#') {
+        switch (ch) {
+        case '(':
+            S[top++] = p;
+            k = 1;
+            break;
+        case ')':
+            top--;
+            break;
+        case ',':
+            k = 2;
+            break;
+        default:
+            p = (Node*)malloc(sizeof(Node));
+            p->data = ch;
+            p->left = p->right = NULL;
+            if (*T == NULL) {
+                *T = p;
+            }
+            else {
+                switch (k) {
+                case 1:
+                    S[top - 1]->left = p;
+                    break;
+                case 2:
+                    S[top - 1]->right = p;
+                    break;
+                }
+            }
+            break;
+        }
+        ch = str[++j];
+    }
+}
+
+
+void preOrderTraversal(Node* root) {
+    if (root == NULL) {
+        return;
+    }
+    printf("%c ", root->data);
+    preOrderTraversal(root->left);
+    preOrderTraversal(root->right);
+}
+
+void inOrderTraversal(Node* root) {
+    if (root == NULL) {
+        return;
+    }
+    inOrderTraversal(root->left);
+    printf("%c ", root->data);
+    inOrderTraversal(root->right);
+}
+
+void postOrderTraversal(Node* root) {
+    if (root == NULL) {
+        return;
+    }
+    postOrderTraversal(root->left);
+    postOrderTraversal(root->right);
+    printf("%c ", root->data);
+}
+
+void printGeneralizedForm(Node* root) {
+    if (root == NULL) {
+        return;
+    }
+    printf("%c", root->data);
+    if (root->left == NULL && root->right == NULL) {
+        return;
+    }
+    printf("(");
+    printGeneralizedForm(root->left);
+    printf(",");
+    printGeneralizedForm(root->right);
+    printf(")");
+}
+
+int main() {
+    Node* root = NULL;
+    DataType str[20] = "0";
+    printf("以广义表形式输入二叉树序列并以#结束：");
+    gets(str);
+    CreateBiTree(&root, str);
+    // Print the tree in generalized form
+    printf("广义表形式输出二叉树: ");
+    printGeneralizedForm(root);
+    printf("\n");
+
+    // Perform tree traversals
+    printf("二叉树前序遍历: ");
+    preOrderTraversal(root);
+    printf("\n");
+
+    printf("二叉树中序遍历: ");
+    inOrderTraversal(root);
+    printf("\n");
+
+    printf("二叉树后序遍历: ");
+    postOrderTraversal(root);
+    printf("\n");
+
+    return 0;
+}
