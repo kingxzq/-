@@ -1,0 +1,153 @@
+#define _CRT_SECURE_NO_WARNINGS 1
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_VERTICES 100
+
+// 邻接表中的边节点
+typedef struct EdgeNode {
+    int dest;
+    struct EdgeNode* next;
+} EdgeNode;
+
+// 邻接表中的顶点节点
+typedef struct VertexNode {
+    int data;
+    EdgeNode* edges;
+    int visited;
+} VertexNode;
+
+// 图结构
+typedef struct Graph {
+    VertexNode vertices[MAX_VERTICES];
+    int numVertices;
+} Graph;
+
+// 初始化图
+void initGraph(Graph* graph) {
+    graph->numVertices = 0;
+    for (int i = 0; i < MAX_VERTICES; i++) {
+        graph->vertices[i].data = 0;
+        graph->vertices[i].edges = NULL;
+        graph->vertices[i].visited = 0;
+    }
+}
+
+// 添加顶点
+void addVertex(Graph* graph, int data) {
+    if (graph->numVertices < MAX_VERTICES) {
+        VertexNode* vertex = &(graph->vertices[graph->numVertices]);
+        vertex->data = data;
+        graph->numVertices++;
+    }
+    else {
+        printf("图已满，无法添加更多顶点\n");
+    }
+}
+
+// 添加边
+void addEdge(Graph* graph, int src, int dest) {
+    if (src >= 0 && src < graph->numVertices && dest >= 0 && dest < graph->numVertices) {
+        EdgeNode* newEdge = (EdgeNode*)malloc(sizeof(EdgeNode));
+        newEdge->dest = dest;
+        newEdge->next = graph->vertices[src].edges;
+        graph->vertices[src].edges = newEdge;
+    }
+    else {
+        printf("顶点索引无效\n");
+    }
+}
+
+// 深度优先遍历递归函数
+void dfsRecursive(Graph* graph, int vertex) {
+    printf("%d ", graph->vertices[vertex].data);
+    graph->vertices[vertex].visited = 1;
+
+    EdgeNode* edge = graph->vertices[vertex].edges;
+    while (edge != NULL) {
+        int dest = edge->dest;
+        if (!graph->vertices[dest].visited) {
+            dfsRecursive(graph, dest);
+        }
+        edge = edge->next;
+    }
+}
+
+// 深度优先遍历
+void dfs(Graph* graph, int startVertex) {
+    for (int i = 0; i < graph->numVertices; i++) {
+        graph->vertices[i].visited = 0;
+    }
+
+    dfsRecursive(graph, startVertex);
+}
+
+// 广度优先遍历
+void bfs(Graph* graph, int startVertex) {
+    int queue[MAX_VERTICES];
+    int front = 0;
+    int rear = 0;
+
+    for (int i = 0; i < graph->numVertices; i++) {
+        graph->vertices[i].visited = 0;
+    }
+
+    printf("%d ", graph->vertices[startVertex].data);
+    graph->vertices[startVertex].visited = 1;
+    queue[rear++] = startVertex;
+
+    while (front < rear) {
+        int vertex = queue[front++];
+        EdgeNode* edge = graph->vertices[vertex].edges;
+        while (edge != NULL) {
+            int dest = edge->dest;
+            if (!graph->vertices[dest].visited) {
+                printf("%d ", graph->vertices[dest].data);
+                graph->vertices[dest].visited = 1;
+                queue[rear++] = dest;
+            }
+            edge = edge->next;
+        }
+    }
+}
+
+int main() {
+    Graph graph;
+    initGraph(&graph);
+
+    int numVertices;
+    printf("输入图中的顶点数: ");
+    scanf("%d", &numVertices);
+
+    for (int i = 0; i < numVertices; i++) {
+        int data;
+        printf("输入顶点的值 %d: ", i);
+        scanf("%d", &data);
+        addVertex(&graph, data);
+    }
+
+    int numEdges;
+    printf("输入图中的边数: ");
+    scanf("%d", &numEdges);
+
+    for (int i = 0; i < numEdges; i++) {
+        int src, dest;
+        printf("输入边的源顶点和目标顶点 %d: ", i);
+        scanf("%d %d", &src, &dest);
+        addEdge(&graph, src, dest);
+    }
+
+    int startVertex;
+    printf("输入遍历的起始顶点: ");
+    scanf("%d", &startVertex);
+
+    printf("深度优先遍历: ");
+    dfs(&graph, startVertex);
+    printf("\n");
+
+    printf("广度优先遍历: ");
+    bfs(&graph, startVertex);
+    printf("\n");
+
+    return 0;
+}
