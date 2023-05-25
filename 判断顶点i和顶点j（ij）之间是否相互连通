@@ -1,0 +1,90 @@
+#define _CRT_SECURE_NO_WARNINGS 1
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_VERTICES 100 // 假设图中顶点的最大数量
+
+// 邻接表中的边结点
+typedef struct EdgeNode {
+    int dest;                  // 目标顶点的索引
+    struct EdgeNode* next;     // 下一条边
+} EdgeNode;
+
+// 邻接表中的顶点结点
+typedef struct VertexNode {
+    EdgeNode* head;            // 指向第一条边的指针
+} VertexNode;
+
+// 有向图的邻接表
+typedef struct DirectedGraph {
+    int numVertices;           // 顶点的数量
+    VertexNode vertices[MAX_VERTICES];
+} DirectedGraph;
+
+// 初始化有向图
+void initDirectedGraph(DirectedGraph* graph, int numVertices) {
+    graph->numVertices = numVertices;
+    for (int i = 0; i < numVertices; i++) {
+        graph->vertices[i].head = NULL;
+    }
+}
+
+// 添加有向边到邻接表
+void addDirectedEdge(DirectedGraph* graph, int src, int dest) {
+    EdgeNode* newEdge = (EdgeNode*)malloc(sizeof(EdgeNode));
+    newEdge->dest = dest;
+    newEdge->next = graph->vertices[src].head;
+    graph->vertices[src].head = newEdge;
+}
+
+// 判断顶点i和顶点j之间是否相互连通
+int areVerticesConnected(DirectedGraph* graph, int i, int j) {
+    // 使用深度优先搜索（DFS）来判断连通性
+    int visited[MAX_VERTICES] = { 0 };  // 记录已访问的顶点
+    visited[i] = 1;                   // 将顶点i标记为已访问
+
+    // 递归地遍历以顶点i为起点的所有可达顶点
+    EdgeNode* edge = graph->vertices[i].head;
+    while (edge != NULL) {
+        if (edge->dest == j) {
+            return 1;  // 找到顶点j，表示相互连通
+        }
+        if (!visited[edge->dest]) {
+            // 如果当前顶点未访问过，则递归继续遍历
+            if (areVerticesConnected(graph, edge->dest, j)) {
+                return 1;  // 在递归遍历中找到顶点j，表示相互连通
+            }
+        }
+        edge = edge->next;
+    }
+
+    return 0;  // 顶点i和顶点j不相互连通
+}
+
+int main() {
+    DirectedGraph graph;
+    int numVertices = 5;  // 有向图中的顶点数量
+
+    // 初始化有向图
+    initDirectedGraph(&graph, numVertices);
+
+    // 添加有向边
+    addDirectedEdge(&graph, 0, 1);
+    addDirectedEdge(&graph, 1, 2);
+    addDirectedEdge(&graph, 2, 3);
+    addDirectedEdge(&graph, 3, 4);
+    addDirectedEdge(&graph, 4, 0);
+
+    int i = 2;  // 顶点i
+    int j = 3;  // 顶点j
+
+    // 判断顶点i和顶点j是否相互连通
+    if (areVerticesConnected(&graph, i, j)) {
+        printf("顶点 %d 和顶点 %d 相互连通\n", i, j);
+    }
+    else {
+        printf("顶点 %d 和顶点 %d 不相互连通\n", i, j);
+    }
+
+    return 0;
+}
