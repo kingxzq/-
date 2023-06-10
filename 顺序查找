@@ -1,0 +1,14 @@
+#include "seqlist.h"
+/*--------顺序查找的非递归实现------*/
+int seqsearch(seqlist l,datatype key)
+{   int k=l.len-1;
+    while (k>=0 && l.data[k]!=key )  k--;
+    return(k);
+}
+linklist linkSearch(linklist  head, datatype  key)
+{
+    linklist p=head->next;
+    while (p && p->data!=key)
+            p=p->next;
+    return p;
+}
