@@ -1,0 +1,129 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<assert.h>
+#include<stdlib.h>
+#include<time.h>
+//交换函数
+void Swap(int* x,int* y)
+{
+    int tmp=*x;
+    *x=*y;
+    *y=tmp;
+}
+//向上调整
+void AdjustUp(int* a,int child)
+{
+    assert(a);
+
+    int parent=(child-1)/2;
+    while(child>0)
+    {
+        if(a[child]<a[parent])
+        {
+            Swap(&a[child],&a[parent]);
+
+            child=parent;
+            parent=(child-1)/2;
+        }
+        else
+            break;
+    }
+}
+//向下调整
+void AdjustDown(int* a,int n,int parent)
+{
+    int child=parent*2+1;
+    while(child<n)
+    {
+        if(child+1<n&&a[child+1]<a[child])
+            ++child;
+        if(a[child]<a[parent])
+        {
+            Swap(&a[child],&a[parent]);
+            parent=child;
+            child=parent*2+1;
+        }
+        else
+            break;
+    }
+}
+void CreateNDate()
+{
+	// 造数据
+	int n = 10000;
+	srand(time(0));
+	const char* file = "data.txt";
+	FILE* fin = fopen(file, "w");
+	if (fin == NULL)
+	{
+		perror("fopen error");
+		return;
+	}
+
+	for (size_t i = 0; i < n; ++i)
+	{
+		int x = rand() % 1000000;
+		fprintf(fin, "%d\n", x);
+	}
+
+	fclose(fin);
+}
+void PrintTopK(int* a, int n, int k)
+{
+	int* kMinHeap = (int*)malloc(sizeof(int)*k);
+	assert(kMinHeap);
+	for (int i = 0; i < k; ++i)
+	{
+		kMinHeap[i] = a[i];
+	}
+	for (int i = (k - 1 - 1) / 2; i >= 0; --i)
+	{
+		AdjustDown(kMinHeap, k, i);
+	}
+
+	for (int j = k; j < n; ++j)
+	{
+		if (a[j] > kMinHeap[0])
+		{
+			kMinHeap[0] = a[j];
+			AdjustDown(kMinHeap, k, 0);
+		}
+	}
+
+	for (int i = 0; i < k; ++i)
+	{
+		printf("%d ", kMinHeap[i]);
+	}
+	printf("\n");
+}
+
+int main()
+{
+	CreateNDate();
+	const char* file = "data.txt";
+    int n = 10000;
+    int a[10000];
+	FILE* fout = fopen(file, "r");
+    if (fout == NULL)
+    {
+        perror("fopen error");
+        exit(-1);
+    }
+
+    for (int i = 0; i < n; ++i)
+    {
+        if (fscanf(fout, "%d", &a[i]) != 1)
+        {
+            perror("fscanf error");
+            fclose(fout);
+            exit(-1);
+        }
+    }
+
+    fclose(fout);
+
+    int k = 10;
+    PrintTopK(a, n, k);
+
+    return 0;
+}
