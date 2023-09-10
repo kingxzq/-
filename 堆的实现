@@ -1,0 +1,180 @@
+//heap.h
+﻿#include<stdio.h>
+#include<stdlib.h>
+#include<assert.h>
+typedef int HPDataType;
+typedef struct Heap
+{
+    HPDataType* _a;
+    int _size;
+    int _capacity; 
+}Heap;
+
+
+// 堆的构建
+void HeapCreate(Heap* hp, HPDataType* a, int n);
+// 堆的销毁
+void HeapDestory(Heap* hp);
+// 堆的插入
+void HeapPush(Heap* hp, HPDataType x);
+// 堆的删除
+void HeapPop(Heap* hp);
+// 取堆顶的数据
+HPDataType HeapTop(Heap* hp);
+// 堆的数据个数
+int HeapSize(Heap* hp);
+// 堆的判空
+int HeapEmpty(Heap* hp);
+// 堆的打印
+void HeapPrint(Heap* hp);
+
+//heap.c
+﻿#include"heap.h"
+void HeapCreate(Heap* hp, HPDataType* a, int n)
+{
+    assert(hp);
+    hp->_a=NULL;
+    hp->_capacity=hp->_size=0;
+    for(int i=0;i<n;++i)
+        HeapPush(hp,a[i]);
+}
+// 堆的销毁
+void HeapDestory(Heap* hp)
+{
+    assert(hp);
+    free(hp->_a);
+    hp->_capacity=hp->_size=0;
+}
+//交换函数
+void Swap(HPDataType* x,HPDataType* y)
+{
+    HPDataType tmp=*x;
+    *x=*y;
+    *y=tmp;
+}
+//向上调整
+void AdjustUp(int* a,int child)
+{
+    assert(a);
+
+
+    int parent=(child-1)/2;
+    while(child>0)
+    {
+        if(a[child]<a[parent])
+        {
+            Swap(&a[child],&a[parent]);
+
+
+            child=parent;
+            parent=(child-1)/2;
+        }
+        else
+            break;
+    }
+}
+//向下调整
+void AdjustDown(int* a,int n,int parent)
+{
+    int child=parent*2+1;
+    while(child<n)
+    {
+        if(child+1<n&&a[child+1]<a[child])
+            ++child;
+        if(a[child]<a[parent])
+        {
+            Swap(&a[child],&a[parent]);
+            parent=child;
+            child=parent*2+1;
+        }
+        else
+            break;
+    }
+}
+// 堆的插入
+void HeapPush(Heap* hp, HPDataType x)
+{
+    assert(hp);
+    if(hp->_size==hp->_capacity)
+    {
+        size_t newCapacity=hp->_capacity==0?4:hp->_capacity*2;
+        HPDataType* tmp=realloc(hp->_a,sizeof(HPDataType)*newCapacity);
+        if(tmp==NULL)
+        {
+            printf("realloc fail\n");
+            exit(-1);
+        }
+
+
+        hp->_a=tmp;
+        hp->_capacity=newCapacity;
+    }
+    hp->_a[hp->_size]=x;
+    hp->_size++;
+    AdjustUp(hp->_a,hp->_size-1);
+}
+// 堆的删除
+void HeapPop(Heap* hp)
+{
+    assert(hp);
+    assert(!HeapEmpty(hp));
+
+
+    Swap(&hp->_a[0],&hp->_a[hp->_size-1]);
+    hp->_size--;
+
+
+    AdjustDown(hp->_a,hp->_size,0);
+}
+// 取堆顶的数据
+HPDataType HeapTop(Heap* hp)
+{
+    assert(hp);
+    assert(!HeapEmpty(hp));
+
+
+    return hp->_a[0];
+}
+// 堆的数据个数
+int HeapSize(Heap* hp)
+{
+    assert(hp);
+    return hp->_size;
+}
+// 堆的判空
+int HeapEmpty(Heap* hp)
+{
+    assert(hp);
+    return hp->_size==0;
+}
+// 堆的打印
+void HeapPrint(Heap* hp)
+{
+    for (int i = 0; i < hp->_size; ++i)
+    {
+        printf("%d ", hp->_a[i]);
+    }
+    printf("\n");
+}
+
+//test.c
+#include"heap.h"
+
+
+int main()
+{
+    int a[] = { 70, 56, 30, 25, 15, 10, 75, 33, 50, 69 };
+    Heap hp;
+    HeapCreate(&hp, a, 10);
+    HeapPrint(&hp);
+    printf("The heap top element is%d\n",HeapTop(&hp));
+    HeapPush(&hp,35);
+    HeapPop(&hp);
+    printf("The length of the current heap is %d\n",HeapSize(&hp));
+    HeapPrint(&hp);
+    while(!HeapEmpty(&hp))
+        HeapPop(&hp);
+    printf("The length of the current heap is %d\n",HeapSize(&hp));
+    HeapDestory(&hp);
+    return 0;
+}﻿
